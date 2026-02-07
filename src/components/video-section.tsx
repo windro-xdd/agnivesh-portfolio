@@ -13,6 +13,7 @@ export function VideoSection() {
             className="absolute inset-0 h-full w-full"
             allow="fullscreen; accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
+            scrolling="no"
             title="The Late Shift - Interactive Film"
           />
         </div>

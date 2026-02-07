@@ -4,7 +4,7 @@ export function About() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
         <div className="relative aspect-[3/4] bg-neutral-900 overflow-hidden shadow-2xl">
           <img 
-            src="/agnivesh-portrait.jpg"
+            src="/agnivesh-portrait.png"
             alt="Agnivesh Sarang"
             className="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-700 ease-in-out"
           />
