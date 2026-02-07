@@ -5,6 +5,7 @@ import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
 import type { DriveFile } from "@/lib/drive"
+import { cn } from "@/lib/utils"
 
 interface GalleryProps {
   images: DriveFile[]
@@ -34,23 +35,9 @@ export function Gallery({ images }: GalleryProps) {
             className="break-inside-avoid relative group cursor-pointer overflow-hidden bg-neutral-900"
             onClick={() => setSelectedImage(index)}
           >
-            <div className="aspect-auto w-full relative">
-              <img
-                src={image.thumbnailLink?.replace('=s220', '=s1200') || `https://drive.google.com/thumbnail?id=${image.id}&sz=w800`}
-                alt={image.name}
-                className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 group-hover:opacity-90"
-                loading="lazy"
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  if (target.src.includes('thumbnailLink')) {
-                    target.src = `https://drive.google.com/thumbnail?id=${image.id}&sz=w800`;
-                  } else {
-                     target.style.opacity = '0.5';
-                  }
-                }}
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+            <div className="relative w-full">
+              <BlurImage image={image} />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 pointer-events-none" />
             </div>
           </motion.div>
         ))}
@@ -63,10 +50,11 @@ export function Gallery({ images }: GalleryProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
+            onClick={() => setSelectedImage(null)}
           >
             <button
               onClick={() => setSelectedImage(null)}
-              className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors"
+              className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-[70]"
             >
               <X size={32} />
             </button>
@@ -76,18 +64,23 @@ export function Gallery({ images }: GalleryProps) {
                 e.stopPropagation()
                 setSelectedImage(prev => prev !== null && prev > 0 ? prev - 1 : images.length - 1)
               }}
-              className="absolute left-4 md:left-8 text-white/50 hover:text-white transition-colors"
+              className="absolute left-4 md:left-8 text-white/50 hover:text-white transition-colors z-[70]"
             >
               <ChevronLeft size={40} />
             </button>
 
-            <div className="relative w-full max-w-6xl max-h-[90vh] flex items-center justify-center">
-              <img
-                src={images[selectedImage].thumbnailLink?.replace('=s220', '=s2000') || images[selectedImage].webContentLink}
-                alt={images[selectedImage].name}
-                className="max-w-full max-h-[85vh] object-contain shadow-2xl"
-                referrerPolicy="no-referrer"
-              />
+            <div className="relative w-full max-w-7xl h-full flex items-center justify-center p-4" onClick={(e) => e.stopPropagation()}>
+               <div className="relative w-full h-full flex items-center justify-center">
+                  <Image
+                    src={images[selectedImage].thumbnailLink?.replace('=s220', '=s2000') || images[selectedImage].webContentLink || ''}
+                    alt={images[selectedImage].name}
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                    quality={90}
+                  />
+               </div>
             </div>
 
             <button
@@ -95,7 +88,7 @@ export function Gallery({ images }: GalleryProps) {
                 e.stopPropagation()
                 setSelectedImage(prev => prev !== null && prev < images.length - 1 ? prev + 1 : 0)
               }}
-              className="absolute right-4 md:right-8 text-white/50 hover:text-white transition-colors"
+              className="absolute right-4 md:right-8 text-white/50 hover:text-white transition-colors z-[70]"
             >
               <ChevronRight size={40} />
             </button>
@@ -103,5 +96,29 @@ export function Gallery({ images }: GalleryProps) {
         )}
       </AnimatePresence>
     </>
+  )
+}
+
+function BlurImage({ image }: { image: DriveFile }) {
+  const [isLoading, setLoading] = useState(true)
+
+  const width = image.imageMediaMetadata?.width || 800
+  const height = image.imageMediaMetadata?.height || 600
+  const aspectRatio = width / height
+
+  return (
+    <div className="relative w-full overflow-hidden bg-neutral-800" style={{ aspectRatio }}>
+      <Image
+        src={image.thumbnailLink?.replace('=s220', '=s1200') || `https://drive.google.com/thumbnail?id=${image.id}&sz=w800`}
+        alt={image.name}
+        fill
+        className={cn(
+          "object-cover duration-700 ease-in-out group-hover:scale-105",
+          isLoading ? "scale-110 blur-2xl grayscale" : "scale-100 blur-0 grayscale-0"
+        )}
+        onLoad={() => setLoading(false)}
+        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+      />
+    </div>
   )
 }

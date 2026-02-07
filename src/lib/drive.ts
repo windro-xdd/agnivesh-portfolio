@@ -7,6 +7,10 @@ export type DriveFile = {
   thumbnailLink?: string
   webContentLink?: string
   createdTime?: string
+  imageMediaMetadata?: {
+    width: number
+    height: number
+  }
 }
 
 const drive = google.drive({
@@ -30,7 +34,7 @@ export async function getPortfolioImages() {
     const imagePromises = folderIds.map(async (id) => {
       const response = await drive.files.list({
         q: `'${id}' in parents and mimeType contains 'image/' and trashed = false`,
-        fields: "files(id, name, mimeType, thumbnailLink, webContentLink, createdTime)",
+        fields: "files(id, name, mimeType, thumbnailLink, webContentLink, createdTime, imageMediaMetadata)",
         orderBy: "createdTime desc",
         pageSize: 100,
       })
