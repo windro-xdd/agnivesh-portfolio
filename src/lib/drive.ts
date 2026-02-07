@@ -41,9 +41,13 @@ async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile
 export async function getPortfolioImages(): Promise<DriveFile[]> {
   try {
     const folderId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY
     
-    if (!folderId) {
-      console.error("Missing NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID")
+    console.log("Drive API Key present:", !!apiKey, "length:", apiKey?.length)
+    console.log("Folder ID:", folderId)
+    
+    if (!folderId || folderId.length < 10) {
+      console.error("Missing or invalid NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID:", folderId)
       return []
     }
 
