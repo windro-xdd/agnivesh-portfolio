@@ -40,16 +40,23 @@ export function Gallery({ images }: GalleryProps) {
         {images.map((image, index) => (
           <motion.div
             key={image.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            initial={{ opacity: 0, scale: 0.9, y: 50 }}
+            whileInView={{ opacity: 1, scale: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ 
+              duration: 0.8, 
+              ease: [0.21, 0.47, 0.32, 0.98],
+              delay: (index % 3) * 0.1
+            }}
             className="mb-4 relative group cursor-pointer overflow-hidden bg-neutral-900"
             onClick={() => setSelectedImage(index)}
           >
-            <div className="relative w-full">
+            <div className="relative w-full overflow-hidden">
               <BlurImage image={image} />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 pointer-events-none" />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-500 pointer-events-none" />
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center pointer-events-none">
+                <p className="text-white/80 tracking-widest text-xs uppercase font-light translate-y-4 group-hover:translate-y-0 transition-transform duration-500">View</p>
+              </div>
             </div>
           </motion.div>
         ))}
