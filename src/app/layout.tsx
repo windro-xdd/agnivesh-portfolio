@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Playfair_Display, Jost } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
+import { FilmGrain } from "@/components/ui/film-grain";
+import { CustomCursor } from "@/components/ui/custom-cursor";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -36,6 +38,8 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <FilmGrain />
+            <CustomCursor />
             <Navbar />
             {children}
           </ThemeProvider>
