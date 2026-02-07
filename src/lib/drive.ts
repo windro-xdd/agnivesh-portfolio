@@ -56,7 +56,10 @@ export async function getPortfolioImages(): Promise<DriveFile[]> {
       "id,name"
     )
 
-    const folderIds = [folderId, ...folders.map((f) => f.id)]
+    console.log("Found subfolders:", folders.map(f => ({ id: f.id, name: f.name })))
+    
+    const folderIds = [folderId, ...folders.map((f) => f.id)].filter(id => id && id.length > 5)
+    console.log("Folder IDs to query:", folderIds)
 
     const imagePromises = folderIds.map((id) =>
       fetchDriveFiles(
