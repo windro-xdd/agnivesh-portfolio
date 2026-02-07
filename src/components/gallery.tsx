@@ -4,11 +4,19 @@ import { useState } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { X, ChevronLeft, ChevronRight } from "lucide-react"
+import Masonry from "react-masonry-css"
 import type { DriveFile } from "@/lib/drive"
 import { cn } from "@/lib/utils"
 
 interface GalleryProps {
   images: DriveFile[]
+}
+
+const breakpointColumnsObj = {
+  default: 3,
+  1100: 3,
+  700: 2,
+  500: 1
 }
 
 export function Gallery({ images }: GalleryProps) {
@@ -24,15 +32,19 @@ export function Gallery({ images }: GalleryProps) {
 
   return (
     <>
-      <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="flex w-auto -ml-4"
+        columnClassName="pl-4 bg-clip-padding"
+      >
         {images.map((image, index) => (
           <motion.div
             key={image.id}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.05 }}
-            className="break-inside-avoid relative group cursor-pointer overflow-hidden bg-neutral-900"
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="mb-4 relative group cursor-pointer overflow-hidden bg-neutral-900"
             onClick={() => setSelectedImage(index)}
           >
             <div className="relative w-full">
@@ -41,7 +53,7 @@ export function Gallery({ images }: GalleryProps) {
             </div>
           </motion.div>
         ))}
-      </div>
+      </Masonry>
 
       <AnimatePresence>
         {selectedImage !== null && (
