@@ -12,7 +12,7 @@ export type DriveFile = {
 }
 
 async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile[]> {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY?.trim()
   
   if (!apiKey) {
     console.error("Missing NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY")
@@ -40,14 +40,10 @@ async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile
 
 export async function getPortfolioImages(): Promise<DriveFile[]> {
   try {
-    const folderId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY
-    
-    console.log("Drive API Key present:", !!apiKey, "length:", apiKey?.length)
-    console.log("Folder ID:", folderId)
+    const folderId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID?.trim()
     
     if (!folderId || folderId.length < 10) {
-      console.error("Missing or invalid NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID:", folderId)
+      console.error("Missing or invalid NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID")
       return []
     }
 
@@ -56,10 +52,7 @@ export async function getPortfolioImages(): Promise<DriveFile[]> {
       "id,name"
     )
 
-    console.log("Found subfolders:", folders.map(f => ({ id: f.id, name: f.name })))
-    
     const folderIds = [folderId, ...folders.map((f) => f.id)].filter(id => id && id.length > 5)
-    console.log("Folder IDs to query:", folderIds)
 
     const imagePromises = folderIds.map((id) =>
       fetchDriveFiles(
