@@ -36,10 +36,19 @@ export function Gallery({ images }: GalleryProps) {
           >
             <div className="aspect-auto w-full relative">
               <img
-                src={image.webContentLink || image.thumbnailLink?.replace('=s220', '=s1200')}
+                src={image.thumbnailLink?.replace('=s220', '=s1200') || `https://drive.google.com/thumbnail?id=${image.id}&sz=w800`}
                 alt={image.name}
                 className="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-105 group-hover:opacity-90"
                 loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  if (target.src.includes('thumbnailLink')) {
+                    target.src = `https://drive.google.com/thumbnail?id=${image.id}&sz=w800`;
+                  } else {
+                     target.style.opacity = '0.5';
+                  }
+                }}
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
             </div>
@@ -74,9 +83,10 @@ export function Gallery({ images }: GalleryProps) {
 
             <div className="relative w-full max-w-6xl max-h-[90vh] flex items-center justify-center">
               <img
-                src={images[selectedImage].webContentLink || images[selectedImage].thumbnailLink?.replace('=s220', '=s2000')}
+                src={images[selectedImage].thumbnailLink?.replace('=s220', '=s2000') || images[selectedImage].webContentLink}
                 alt={images[selectedImage].name}
                 className="max-w-full max-h-[85vh] object-contain shadow-2xl"
+                referrerPolicy="no-referrer"
               />
             </div>
 
