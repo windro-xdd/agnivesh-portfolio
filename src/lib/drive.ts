@@ -1,5 +1,3 @@
-import { google } from "googleapis"
-
 export type DriveFile = {
   id: string
   name: string
@@ -13,33 +11,54 @@ export type DriveFile = {
   }
 }
 
-const drive = google.drive({
-  version: "v3",
-  auth: process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY,
-})
+const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY
+const FOLDER_ID = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID
 
-export async function getPortfolioImages() {
+async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile[]> {
+  if (!API_KEY) {
+    console.error("Missing NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY")
+    return []
+  }
+  
+  const url = new URL("https://www.googleapis.com/drive/v3/files")
+  url.searchParams.set("q", query)
+  url.searchParams.set("fields", `files(${fields})`)
+  url.searchParams.set("orderBy", "createdTime desc")
+  url.searchParams.set("pageSize", "100")
+  url.searchParams.set("key", API_KEY)
+  
+  const response = await fetch(url.toString(), { next: { revalidate: 3600 } })
+  
+  if (!response.ok) {
+    const error = await response.text()
+    console.error("Drive API error:", response.status, error)
+    return []
+  }
+  
+  const data = await response.json()
+  return data.files || []
+}
+
+export async function getPortfolioImages(): Promise<DriveFile[]> {
   try {
-    const folderId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID
-    if (!folderId) return []
+    if (!FOLDER_ID) {
+      console.error("Missing NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID")
+      return []
+    }
 
-    const foldersResponse = await drive.files.list({
-      q: `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
-      fields: "files(id, name)",
-    })
+    const folders = await fetchDriveFiles(
+      `'${FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+      "id,name"
+    )
 
-    const folders = foldersResponse.data.files || []
-    const folderIds = [folderId, ...folders.map((f) => f.id)]
+    const folderIds = [FOLDER_ID, ...folders.map((f) => f.id)]
 
-    const imagePromises = folderIds.map(async (id) => {
-      const response = await drive.files.list({
-        q: `'${id}' in parents and mimeType contains 'image/' and trashed = false`,
-        fields: "files(id, name, mimeType, thumbnailLink, webContentLink, createdTime, imageMediaMetadata)",
-        orderBy: "createdTime desc",
-        pageSize: 100,
-      })
-      return (response.data.files as DriveFile[]) || []
-    })
+    const imagePromises = folderIds.map((id) =>
+      fetchDriveFiles(
+        `'${id}' in parents and mimeType contains 'image/' and trashed = false`,
+        "id,name,mimeType,thumbnailLink,webContentLink,createdTime,imageMediaMetadata"
+      )
+    )
 
     const imagesArrays = await Promise.all(imagePromises)
     const allImages = imagesArrays.flat().sort((a, b) => {
