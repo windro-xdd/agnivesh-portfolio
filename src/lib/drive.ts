@@ -11,11 +11,10 @@ export type DriveFile = {
   }
 }
 
-const API_KEY = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY
-const FOLDER_ID = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID
-
 async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile[]> {
-  if (!API_KEY) {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY
+  
+  if (!apiKey) {
     console.error("Missing NEXT_PUBLIC_GOOGLE_DRIVE_API_KEY")
     return []
   }
@@ -25,7 +24,7 @@ async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile
   url.searchParams.set("fields", `files(${fields})`)
   url.searchParams.set("orderBy", "createdTime desc")
   url.searchParams.set("pageSize", "100")
-  url.searchParams.set("key", API_KEY)
+  url.searchParams.set("key", apiKey)
   
   const response = await fetch(url.toString(), { next: { revalidate: 3600 } })
   
@@ -41,17 +40,19 @@ async function fetchDriveFiles(query: string, fields: string): Promise<DriveFile
 
 export async function getPortfolioImages(): Promise<DriveFile[]> {
   try {
-    if (!FOLDER_ID) {
+    const folderId = process.env.NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID
+    
+    if (!folderId) {
       console.error("Missing NEXT_PUBLIC_GOOGLE_DRIVE_FOLDER_ID")
       return []
     }
 
     const folders = await fetchDriveFiles(
-      `'${FOLDER_ID}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
+      `'${folderId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
       "id,name"
     )
 
-    const folderIds = [FOLDER_ID, ...folders.map((f) => f.id)]
+    const folderIds = [folderId, ...folders.map((f) => f.id)]
 
     const imagePromises = folderIds.map((id) =>
       fetchDriveFiles(
