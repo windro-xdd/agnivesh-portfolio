@@ -65,24 +65,24 @@ export function Hero() {
 
           <div className="overflow-hidden">
             <motion.h1 
-              className="text-7xl md:text-[10rem] font-serif font-medium tracking-tighter text-white leading-[0.9] flex flex-col items-center justify-center"
+              className="text-7xl md:text-[10rem] font-serif font-medium tracking-tighter text-white leading-[0.85] flex flex-col items-center justify-center"
               variants={STAGGER_CHILDREN}
               initial="initial"
               animate="animate"
             >
-              <div className="overflow-hidden flex py-2">
+              <div className="overflow-hidden flex">
                 {Array.from("Agnivesh").map((letter, i) => (
                   <motion.span key={i} variants={LETTER_ANIMATION} className="inline-block">
                     {letter}
                   </motion.span>
                 ))}
               </div>
-              <div className="overflow-hidden flex pt-4 pb-12 -mt-4 md:-mt-8">
+              <div className="overflow-hidden flex">
                 {Array.from("Sarang").map((letter, i) => (
                   <motion.span 
                     key={i} 
                     variants={LETTER_ANIMATION} 
-                    className="inline-block italic text-neutral-400 pb-4"
+                    className="inline-block italic text-neutral-500"
                   >
                     {letter}
                   </motion.span>
@@ -107,11 +107,17 @@ export function Hero() {
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1 }}
         style={{ opacity }}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4 cursor-pointer"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 cursor-pointer group"
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
       >
-        <span className="text-[10px] uppercase tracking-[0.3em] text-neutral-500 font-bold rotate-90 mb-8 origin-left hover:text-orange-500 transition-colors duration-300">Scroll</span>
-        <div className="w-[1px] h-12 bg-gradient-to-b from-orange-600 to-transparent animate-pulse" />
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+          className="flex flex-col items-center"
+        >
+          <ArrowDown className="w-4 h-4 text-orange-500" />
+        </motion.div>
+        <span className="text-[9px] uppercase tracking-[0.4em] text-neutral-600 group-hover:text-orange-500 transition-colors duration-300">Scroll</span>
       </motion.div>
     </section>
   );
