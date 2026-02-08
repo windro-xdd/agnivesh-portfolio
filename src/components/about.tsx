@@ -55,7 +55,7 @@ export function About() {
 
           <div className="space-y-8 text-neutral-400 font-light leading-relaxed text-lg md:text-xl max-w-3xl">
             <p>
-              I am an award-winning documentary director and visual storyteller, currently studying <span className="text-white font-medium border-b border-orange-600/30">Film and Media at the University of Stirling</span>. I bring a fresh perspective to every frame, blending technical precision with raw emotional narrative.
+              I am an award-winning documentary director and visual storyteller, a graduate of <span className="text-white font-medium border-b border-orange-600/30">Film and Media from the University of Stirling</span>. I bring a fresh perspective to every frame, blending technical precision with raw emotional narrative.
             </p>
             <p>
               My experience spans major broadcast productions, including factual projects with the <span className="text-white font-medium">BBC</span> and the long-running reality series <span className="text-white italic">Love It or List It</span> for <span className="text-white font-medium">Channel 4</span>.
